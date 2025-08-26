@@ -1,19 +1,20 @@
-personas = [
-    {"nombre": "Ana", "edad": 11},
-    {"nombre": "Luis", "edad": 13},
-    {"nombre": "María", "edad": 34},
-    {"nombre": "Carlos", "edad": 55},
-    {"nombre": "Sofía", "edad": 20}
-]
+def add_numbers(a, b):
+    """
+    Add two numbers together.
 
-total_recaudado = 0
+    Parameters:
+        a (int or float): The first number.
+        b (int or float): The second number.
 
-for persona in personas:
-    if persona["edad"] >= 18:
-        print(f'{persona["nombre"]} es adulto y paga 10')
-        total_recaudado += 10
-    else:
-        print(f'{persona["nombre"]} es niño y paga 5')
-        total_recaudado += 5
+    Returns:
+        int or float: The sum of the two input values.
+    """
+    result = a + b
+    return result
 
-print("Total recaudado:", total_recaudado)
+
+if __name__ == "__main__":
+    number = add_numbers(25, 15)
+    print("El resultado es:", number)
+
+    # The function add_numbers is already defined above, so no need to redefine it here.
