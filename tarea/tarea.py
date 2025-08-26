@@ -1,9 +1,9 @@
 personas = [
-    {"nombre": "Ana", "edad": 17},
-    {"nombre": "Luis", "edad": 22},
-    {"nombre": "María", "edad": 15},
-    {"nombre": "Carlos", "edad": 30},
-    {"nombre": "Sofía", "edad": 18}
+    {"nombre": "Ana", "edad": 11},
+    {"nombre": "Luis", "edad": 13},
+    {"nombre": "María", "edad": 34},
+    {"nombre": "Carlos", "edad": 55},
+    {"nombre": "Sofía", "edad": 20}
 ]
 
 total_recaudado = 0
