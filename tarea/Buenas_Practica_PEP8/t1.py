@@ -17,4 +17,3 @@ if __name__ == "__main__":
     number = add_numbers(25, 15)
     print("El resultado es:", number)
 
-    # The function add_numbers is already defined above, so no need to redefine it here.
