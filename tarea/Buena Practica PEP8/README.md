@@ -1,19 +1,24 @@
-🐍 Guía rápida de PEP 8
+##  🐍 PEP 8 – Guía rápida
 
-PEP 8 es la guía de estilo oficial de Python. Seguirla hace tu código más limpio y legible.
+PEP 8 es la guía de estilo de Python para escribir código limpio y legible.
 
-- Indentación: usa 4 espacios por nivel.
+🟦 Indentación & Espacios
 
-- Nombres claros: variables y funciones en snake_case, clases en PascalCase.
+4 espacios por nivel.
 
-- Espacios: deja espacios alrededor de operadores y después de comas.
+Espacios alrededor de operadores y después de comas.
 
-- Líneas cortas: máximo 79 caracteres por línea.
+🟩 Nombres
 
-- Importaciones: una por línea; estándar, externas, locales.
+Variables y funciones: snake_case.
 
-- Documentación: agrega docstrings a funciones y clases.
+Clases: PascalCase.
 
-- Consistencia: mantén uniforme comillas, nombres y estilo.
+🟨 Líneas & Documentación
 
-- Herramientas útiles: flake8 para revisar estilo y black para formatear.
+Máximo 79 caracteres por línea.
+
+Usa docstrings para funciones y clases.
+
+✅ Beneficio: Código claro, consistente y fácil de mantener.
+⚠️ Precaución: Requiere revisar estilo y mantener consistencia.
