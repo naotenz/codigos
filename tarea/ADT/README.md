@@ -2,7 +2,7 @@
 
 En esta sección comparo dos tipos de Abstract Data Types (ADT) según su manejo de memoria, flexibilidad y complejidad.
 
-🟦 ADT Estática
+## 🟦 ADT Estática
 
 Simplicidad: Fácil de observar y manejar.
 
@@ -14,7 +14,7 @@ Modificación: Solo puede modificarse antes de usar; no permite cambios dinámic
 
 ⚠️ Desventaja: Poco flexible; no permite agregar o eliminar elementos durante la ejecución.
 
-🟩 ADT Dinámica
+## 🟩 ADT Dinámica
 
 Complejidad: Más complejo de implementar y observar.
 
