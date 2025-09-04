@@ -1,6 +1,6 @@
-class Conjunct:
+class Conjunto:
     def __init__(self):
-        # Inicializamos el conjunto como una lista vacía
+        # Inicializamos el conjunto como una list vacía
         self._elementos = []
 
     # Getter: obtener los elementos del conjunto
@@ -27,7 +27,7 @@ class Conjunct:
         return elemento in self._elementos
 
 # Crear un conjunto
-mi_conjunto = Conjunct()
+mi_conjunto = Conjunto()
 
 # Usar setter para agregar varios elementos
 mi_conjunto.set_elementos([1, 2, 3, 3, 4])
