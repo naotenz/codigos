@@ -66,3 +66,12 @@ Fin Algoritmo
 │ 17 │
 └────────────────────┘
 ---
+def suma_elementos(conjunto):
+    suma = 0
+    for elemento in conjunto:
+        suma += elemento
+    return suma
+
+# Ejemplo
+A = [3, 5, 7, 2]
+print("La suma es:", suma_elementos(A))  # La suma es: 17
