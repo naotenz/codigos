@@ -74,5 +74,3 @@ Fin Algoritmo
 Con eso se verá **alineado y limpio**, porque el bloque `text` usa **fuente monoespaciada** (cada caracter ocupa el mismo ancho).  
 
 ---
-
-👉 Pregunta: ¿quieres que te prepare un `README.md` con el diagrama ya arreglado y listo para copiar/pegar, o prefieres que te muestre cómo hacerlo con **dibujos gráficos (SVG/mermaid)** para que se vea todavía más bonito en GitHub?
