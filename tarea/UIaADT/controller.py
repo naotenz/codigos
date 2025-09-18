@@ -1,28 +1,22 @@
 # controller.py
+from model import Polinomio
 
-class ContadorController:
-    """
-    El Controlador conecta la Vista con el Modelo.
-    Maneja las interacciones del usuario y actualiza la vista
-    cuando los datos en el modelo cambian.
-    """
-    def __init__(self, model, view):
-        self.model = model
+class Controller:
+    def __init__(self, view):
         self.view = view
 
-    def manejar_incremento(self):
-        """
-        Esta función es llamada desde la Vista (el botón).
-        Le pide al Modelo que se actualice y luego actualiza la Vista.
-        """
-        # 1. Actualizar el Modelo
-        self.model.incrementar()
+    def crear_polinomio(self, texto):
+        # Ej: "3 0 2" -> 3 + 0x + 2x^2
+        coef = list(map(int, texto.split()))
+        return Polinomio(coef)
 
-        # 2. Actualizar la Vista con los nuevos datos del Modelo
-        self.actualizar_vista()
+    def sumar(self, p1_texto, p2_texto):
+        p1 = self.crear_polinomio(p1_texto)
+        p2 = self.crear_polinomio(p2_texto)
+        resultado = p1 + p2
+        self.view.mostrar_resultado(f"Suma: {resultado}")
 
-    def actualizar_vista(self):
-        """
-        Obtiene los datos del modelo y los muestra en la vista.
-        """
-        self.view.ids.etiqueta_numero.text = str(self.model.contador)
+    def evaluar(self, p1_texto, x_valor):
+        p1 = self.crear_polinomio(p1_texto)
+        resultado = p1.evaluar(int(x_valor))
+        self.view.mostrar_resultado(f"Evaluación: {resultado}")

@@ -1,0 +1,37 @@
+# main.kv
+<MainView>:
+    input_p1: input_p1
+    input_p2: input_p2
+    input_x: input_x
+    output_label: output_label
+
+    orientation: "vertical"
+    padding: 20
+    spacing: 10
+
+    TextInput:
+        id: input_p1
+        hint_text: "Coeficientes polinomio 1 (ej: 3 0 2)"
+        multiline: False
+
+    TextInput:
+        id: input_p2
+        hint_text: "Coeficientes polinomio 2 (ej: 1 4)"
+        multiline: False
+
+    TextInput:
+        id: input_x
+        hint_text: "Valor de x para evaluar"
+        multiline: False
+
+    Button:
+        text: "Sumar"
+        on_press: root.controller.sumar(root.input_p1.text, root.input_p2.text)
+
+    Button:
+        text: "Evaluar P1 en x"
+        on_press: root.controller.evaluar(root.input_p1.text, root.input_x.text)
+
+    Label:
+        id: output_label
+        text: "Resultado aparecerá aquí"
