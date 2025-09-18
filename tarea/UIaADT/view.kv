@@ -1,0 +1,15 @@
+<ContadorView>:
+    orientation: 'vertical'
+    padding: 20
+    spacing: 20
+
+    Label:
+        id: etiqueta_numero
+        text: "0"  # Texto inicial
+        font_size: '50sp'
+        halign: 'center'
+
+    Button:
+        text: "Incrementar"
+        font_size: '30sp'
+        on_press: app.controller.manejar_incremento()
