@@ -1,4 +1,9 @@
 <MainView>:
+    input_p1: input_p1
+    input_p2: input_p2
+    input_x: input_x
+    output_label: output_label
+
     orientation: "vertical"
     padding: 10
     spacing: 10
@@ -10,6 +15,9 @@
         TextInput:
             id: input_p1
             multiline: False
+
+    BoxLayout:
+        orientation: "horizontal"
         Label:
             text: "Polinomio 2:"
         TextInput:
@@ -29,6 +37,9 @@
         Button:
             text: "Sumar"
             on_press: root.controller.sumar(input_p1.text, input_p2.text)
+        Button:
+            text: "Multiplicar"
+            on_press: root.controller.multiplicar(input_p1.text, input_p2.text)
         Button:
             text: "Evaluar"
             on_press: root.controller.evaluar(input_p1.text, input_x.text)

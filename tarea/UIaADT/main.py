@@ -1,4 +1,3 @@
-# main.py
 from kivy.app import App
 from view import MainView
 from controller import Controller
