@@ -1,0 +1,98 @@
+# Nodo: representa cada elemento de la lista
+class Nodo:
+    def __init__(self, dato):
+        self.dato = dato
+        self.siguiente = None  # referencia al siguiente nodo
+
+    # Getter y Setter del dato
+    def get_dato(self):
+        return self.dato
+
+    def set_dato(self, nuevo_dato):
+        self.dato = nuevo_dato
+
+    # Getter y Setter del siguiente nodo
+    def get_siguiente(self):
+        return self.siguiente
+
+    def set_siguiente(self, nuevo_siguiente):
+        self.siguiente = nuevo_siguiente
+
+
+# Lista Simplemente Enlazada
+class ListaSimple:
+    def __init__(self):
+        self.cabeza = None  # primer nodo
+
+    # Método para verificar si la lista está vacía
+    def esta_vacia(self):
+        return self.cabeza is None
+
+    # Insertar al inicio
+    def insertar_inicio(self, dato):
+        nuevo = Nodo(dato)
+        nuevo.set_siguiente(self.cabeza)
+        self.cabeza = nuevo
+
+    # Insertar al final
+    def insertar_final(self, dato):
+        nuevo = Nodo(dato)
+        if self.esta_vacia():
+            self.cabeza = nuevo
+        else:
+            actual = self.cabeza
+            while actual.get_siguiente() is not None:
+                actual = actual.get_siguiente()
+            actual.set_siguiente(nuevo)
+
+    # Buscar un elemento
+    def buscar(self, dato):
+        actual = self.cabeza
+        while actual is not None:
+            if actual.get_dato() == dato:
+                return True
+            actual = actual.get_siguiente()
+        return False
+
+    # Eliminar un elemento
+    def eliminar(self, dato):
+        actual = self.cabeza
+        anterior = None
+        while actual is not None:
+            if actual.get_dato() == dato:
+                if anterior is None:
+                    self.cabeza = actual.get_siguiente()
+                else:
+                    anterior.set_siguiente(actual.get_siguiente())
+                return True
+            anterior = actual
+            actual = actual.get_siguiente()
+        return False
+
+    # Mostrar todos los elementos de la lista
+    def mostrar(self):
+        elementos = []
+        actual = self.cabeza
+        while actual is not None:
+            elementos.append(actual.get_dato())
+            actual = actual.get_siguiente()
+        return elementos
+
+# Crear lista
+lista = ListaSimple()
+
+# Insertar elementos
+lista.insertar_inicio(10)
+lista.insertar_final(20)
+lista.insertar_final(30)
+lista.insertar_inicio(5)
+
+# Mostrar contenido
+print("Lista:", lista.mostrar())  # [5, 10, 20, 30]
+
+# Buscar elemento
+print("¿Existe 20?:", lista.buscar(20))  # True
+
+# Eliminar elemento
+lista.eliminar(10)
+print("Después de eliminar 10:", lista.mostrar())  # [5, 20, 30]
