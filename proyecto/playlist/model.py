@@ -14,7 +14,9 @@ class Estudiante:
 
     def __str__(self):
         notas = ', '.join(map(str, self.calificaciones))
-        return f"ID: {self.id}, Nombre: {self.nombre} {self.apellido}, Calificaciones: [{notas}], Promedio: {self.promedio():.2f}"
+        # sin promedio aquí
+        return f"ID: {self.id}, Nombre: {self.nombre} {self.apellido}, Calificaciones: [{notas}]"
+
 
 class Nodo:
     def __init__(self, estudiante):

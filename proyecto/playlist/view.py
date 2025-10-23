@@ -5,6 +5,7 @@ from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
 from lista_estudiantes import ListaEstudiantes
+from kivy.uix.popup import Popup
 from model import Estudiante
 
 class GestionEstudiantesView(BoxLayout):
@@ -125,16 +126,41 @@ class GestionEstudiantesView(BoxLayout):
         except ValueError:
             self.actualizar_estado("ID inválido o calificaciones incorrectas")
 
+
+
     def calcular_promedio(self, instance):
-        try:
-            id = int(self.buscar_input.text)  # Usar ID del TextInput
-            promedio = self.lista.promedio_estudiante(id)
-            if promedio is not None:
-                self.actualizar_estado(f'Promedio del estudiante: {promedio:.2f}')
-            else:
-                self.actualizar_estado(f'Estudiante con ID {id} no encontrado')
-        except ValueError:
-            self.actualizar_estado("ID inválido")
+        id_texto = self.buscar_input.text.strip()
+
+        # ❌ Campo vacío o no numérico
+        if not id_texto.isdigit():
+            popup = Popup(title="Error",
+                      content=Label(text="Por favor ingresa un ID válido", halign="center"),
+                      size_hint=(0.6, 0.4))
+            popup.open()
+            return
+
+        id_num = int(id_texto)
+        estudiante = self.lista.buscar(id_num)
+
+        # ❌ ID no encontrado
+        if not estudiante:
+            popup = Popup(title="Error",
+                      content=Label(text=f"Estudiante con ID {id_num} no encontrado", halign="center"),
+                      size_hint=(0.6, 0.4))
+            popup.open()
+            return
+
+        # ✅ ID válido, mostrar promedio
+        promedio = estudiante.promedio()
+        popup = Popup(title="📘 Promedio del estudiante",
+                  content=Label(text=f"El promedio de {estudiante.nombre} {estudiante.apellido} (ID {id_num}) es: {promedio:.2f}",
+                                halign="center"),
+                  size_hint=(0.7, 0.4))
+        popup.open()
+
+
+
+
 
     def generar_reporte(self, instance):
         texto = ""
