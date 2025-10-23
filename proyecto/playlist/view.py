@@ -1,4 +1,3 @@
-# view.py
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
@@ -19,7 +18,7 @@ class GestionEstudiantesView(BoxLayout):
         self.estado_label = Label(text='Sistema de Gestión de Estudiantes', size_hint_y=None, height=30)
         self.add_widget(self.estado_label)
 
-        # Formulario (sin campo de ID)
+        # Formulario para inscribir / actualizar calificaciones
         form = BoxLayout(size_hint_y=None, height=30)
         self.nombre_input = TextInput(hint_text='Nombre', multiline=False)
         self.apellido_input = TextInput(hint_text='Apellido', multiline=False)
@@ -29,7 +28,7 @@ class GestionEstudiantesView(BoxLayout):
         form.add_widget(self.calif_input)
         self.add_widget(form)
 
-        # Botones
+        # Botones principales
         botones = BoxLayout(size_hint_y=None, height=50)
         btn_agregar = Button(text='Inscribir')
         btn_agregar.bind(on_press=self.inscribir)
@@ -39,14 +38,20 @@ class GestionEstudiantesView(BoxLayout):
         btn_actualizar.bind(on_press=self.actualizar_calificaciones)
         btn_promedio = Button(text='Calcular Promedio')
         btn_promedio.bind(on_press=self.calcular_promedio)
-        btn_reporte = Button(text='Generar Reporte')
-        btn_reporte.bind(on_press=self.generar_reporte)
         botones.add_widget(btn_agregar)
         botones.add_widget(btn_eliminar)
         botones.add_widget(btn_actualizar)
         botones.add_widget(btn_promedio)
-        botones.add_widget(btn_reporte)
         self.add_widget(botones)
+
+        # Caja para buscar estudiante por ID
+        self.buscar_input = TextInput(hint_text='ID a buscar', size_hint_x=0.3, multiline=False)
+        self.buscar_btn = Button(text='Buscar Estudiante', size_hint_x=0.7)
+        self.buscar_btn.bind(on_press=self.buscar_estudiante)
+        buscar_box = BoxLayout(size_hint_y=None, height=30)
+        buscar_box.add_widget(self.buscar_input)
+        buscar_box.add_widget(self.buscar_btn)
+        self.add_widget(buscar_box)
 
         # ScrollView para reporte
         self.scroll = ScrollView()
@@ -59,7 +64,7 @@ class GestionEstudiantesView(BoxLayout):
     def actualizar_estado(self, texto):
         self.estado_label.text = texto
 
-    # Actualizar reporte
+    # Actualizar reporte en ScrollView
     def actualizar_lista(self, reporte_texto):
         self.grid.clear_widgets()
         for line in reporte_texto.split('\n'):
@@ -76,8 +81,8 @@ class GestionEstudiantesView(BoxLayout):
             if len(calificaciones) != 3:
                 self.actualizar_estado("Error: Debes ingresar exactamente 3 calificaciones")
                 return
-            if any(c < 1 or c > 100 for c in calificaciones):
-                self.actualizar_estado("Error: Las calificaciones deben estar entre 1 y 100")
+            if any(c < 0 or c > 100 for c in calificaciones):
+                self.actualizar_estado("Error: Las calificaciones deben estar entre 0 y 100")
                 return
 
             id = self.siguiente_id
@@ -92,44 +97,67 @@ class GestionEstudiantesView(BoxLayout):
 
     def dar_de_baja(self, instance):
         try:
-            id = int(input("Ingrese ID del estudiante a dar de baja: "))
+            id = int(self.buscar_input.text)  # Usar el ID del TextInput
             if self.lista.dar_de_baja(id):
                 self.actualizar_estado(f'Estudiante con ID {id} eliminado')
+                self.calif_input.text = ''
                 self.generar_reporte(None)
             else:
-                self.actualizar_estado('Estudiante no encontrado')
-        except Exception as e:
-            self.actualizar_estado(f'Error: {e}')
+                self.actualizar_estado(f'Estudiante con ID {id} no encontrado')
+        except ValueError:
+            self.actualizar_estado("ID inválido")
 
     def actualizar_calificaciones(self, instance):
         try:
-            id = int(input("Ingrese ID del estudiante a actualizar: "))
+            id = int(self.buscar_input.text)  # Usar ID del TextInput
             calificaciones = list(map(int, self.calif_input.text.split()))
             if len(calificaciones) != 3:
                 self.actualizar_estado("Error: Debes ingresar exactamente 3 calificaciones")
                 return
-            if any(c < 1 or c > 100 for c in calificaciones):
-                self.actualizar_estado("Error: Las calificaciones deben estar entre 1 y 100")
+            if any(c < 0 or c > 100 for c in calificaciones):
+                self.actualizar_estado("Error: Las calificaciones deben estar entre 0 y 100")
                 return
             if self.lista.actualizar_calificaciones(id, calificaciones):
-                self.actualizar_estado('Calificaciones actualizadas')
+                self.actualizar_estado(f'Calificaciones del estudiante con ID {id} actualizadas')
                 self.generar_reporte(None)
             else:
-                self.actualizar_estado('Estudiante no encontrado')
-        except Exception as e:
-            self.actualizar_estado(f'Error: {e}')
+                self.actualizar_estado(f'Estudiante con ID {id} no encontrado')
+        except ValueError:
+            self.actualizar_estado("ID inválido o calificaciones incorrectas")
 
     def calcular_promedio(self, instance):
         try:
-            id = int(input("Ingrese ID del estudiante: "))
+            id = int(self.buscar_input.text)  # Usar ID del TextInput
             promedio = self.lista.promedio_estudiante(id)
             if promedio is not None:
                 self.actualizar_estado(f'Promedio del estudiante: {promedio:.2f}')
             else:
-                self.actualizar_estado('Estudiante no encontrado')
-        except Exception as e:
-            self.actualizar_estado(f'Error: {e}')
+                self.actualizar_estado(f'Estudiante con ID {id} no encontrado')
+        except ValueError:
+            self.actualizar_estado("ID inválido")
 
     def generar_reporte(self, instance):
-        reporte = self.lista.generar_reporte()
-        self.actualizar_lista(reporte)
+        texto = ""
+        actual = self.lista.cabeza
+        while actual:
+            texto += str(actual.estudiante) + "\n"
+            actual = actual.siguiente
+        self.actualizar_lista(texto)
+
+
+    def buscar_estudiante(self, instance):
+        try:
+            id = int(self.buscar_input.text)
+            estudiante = self.lista.buscar(id)
+            if estudiante:
+                # Mostrar info en estado_label
+                self.actualizar_estado(str(estudiante))
+                # Llenar calif_input con sus calificaciones actuales para poder modificarlas
+                self.calif_input.text = ' '.join(map(str, estudiante.calificaciones))
+            else:
+                self.actualizar_estado(f'Estudiante con ID {id} no encontrado')
+                self.calif_input.text = ''
+        except ValueError:
+            self.actualizar_estado("ID inválido")
+
+

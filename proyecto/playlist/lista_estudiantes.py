@@ -7,15 +7,17 @@ class ListaEstudiantes:
 
     def inscribir(self, estudiante):
         nuevo_nodo = Nodo(estudiante)
-        if not self.cabeza or estudiante.id < self.cabeza.estudiante.id:
+        if not self.cabeza or estudiante.apellido < self.cabeza.estudiante.apellido:
             nuevo_nodo.siguiente = self.cabeza
             self.cabeza = nuevo_nodo
             return
+
         actual = self.cabeza
-        while actual.siguiente and actual.siguiente.estudiante.id < estudiante.id:
+        while actual.siguiente and actual.siguiente.estudiante.apellido < estudiante.apellido:
             actual = actual.siguiente
         nuevo_nodo.siguiente = actual.siguiente
         actual.siguiente = nuevo_nodo
+
 
     def dar_de_baja(self, id):
         actual = self.cabeza
@@ -59,3 +61,4 @@ class ListaEstudiantes:
             reporte.append(str(actual.estudiante))
             actual = actual.siguiente
         return "\n".join(reporte)
+
