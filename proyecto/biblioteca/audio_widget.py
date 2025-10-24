@@ -13,10 +13,10 @@ class AudioPlayer(BoxLayout):
     state = StringProperty('stop')
     volume = NumericProperty(1)
 
-    def __init__(self, source=None, **kwargs):
+    def __init__(self, source=None, autoplay=False, **kwargs):
         super().__init__(orientation='vertical', **kwargs)
         self.sound = None
-        self.source = source
+        self.source = None
 
         # --- Controles ---
         controls = BoxLayout(size_hint_y=None, height=50)
@@ -43,15 +43,26 @@ class AudioPlayer(BoxLayout):
 
         # Actualizar progreso cada 0.5 seg
         Clock.schedule_interval(self.update_progress, 0.5)
+        if source:
+            self.load(source, autoplay=autoplay)
 
-        if self.source:
-            self.load(self.source)
 
-    def load(self, source):
+    # Cargar una canción nueva
+    def load(self, source, autoplay=False):
+        # Detener sonido anterior
+        if self.sound:
+            self.sound.stop()
         self.source = source
         self.sound = SoundLoader.load(source)
         if self.sound:
             self.duration = self.sound.length
+            self.position = 0
+            self.state = 'stop'
+            self.play_btn.text = "Play"
+            self.progress.value = 0
+            self.lbl_time.text = f"0:00 / {int(self.duration//60)}:{int(self.duration%60):02}"
+            if autoplay:
+                self.sound.play()
 
     def toggle_play(self, instance=None):
         if not self.sound:
@@ -70,6 +81,9 @@ class AudioPlayer(BoxLayout):
             self.sound.stop()
             self.state = 'stop'
             self.play_btn.text = "Play"
+            self.position = 0
+            self.progress.value = 0
+            self.lbl_time.text = f"0:00 / {int(self.duration//60)}:{int(self.duration%60):02}"
 
     def set_volume(self, instance, value):
         if self.sound:
@@ -77,13 +91,13 @@ class AudioPlayer(BoxLayout):
         self.volume = value
 
     def seek_to(self, instance, touch):
-        if instance.collide_point(*touch.pos) and self.sound:
+        if instance.collide_point(*touch.pos) and self.sound and self.sound.length:
             pos = instance.value * self.sound.length
             self.sound.seek(pos)
+            self.position = pos
 
     def update_progress(self, dt):
-        if self.sound and self.sound.length:
+        if self.sound and self.sound.length and self.sound.state == 'play':
             self.position = self.sound.get_pos()
-            self.duration = self.sound.length
             self.progress.value = self.position / self.duration if self.duration else 0
             self.lbl_time.text = f"{int(self.position//60)}:{int(self.position%60):02} / {int(self.duration//60)}:{int(self.duration%60):02}"

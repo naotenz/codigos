@@ -10,9 +10,7 @@ from controller import MusicaController
 class MusicaApp(App):
     def build(self):
         view = MusicaView()
-        controller = MusicaController(view)
-        view.controller = controller
-        view.init_binds()
+        MusicaController(view)
         return view
 
 

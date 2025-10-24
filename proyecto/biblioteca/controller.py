@@ -1,23 +1,20 @@
 import os
 import re
 import threading
+import sys
 from kivy.clock import Clock
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.core.audio import SoundLoader
+
 from model import Cancion, ListaMusica
 import yt_dlp
 from kivy.uix.video import Video
 from kivy.uix.slider import Slider
-from view import VideoPlayer 
-from kivy.uix.videoplayer import VideoPlayer
+from view import MusicaView, VideoPlayer
 from audio_widget import AudioPlayer
-from view import MusicaView, AudioPlayer, VideoPlayer
-from audio_widget import AudioPlayer
-import sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 
 
@@ -193,40 +190,104 @@ class MusicaController:
         self.view.actualizar_biblioteca()
 
     # ----------------------------
-    # Reproducción
+        # ----------------------------
+    # Reproducción segura de audio y video
     def cargar_cancion(self, cancion):
-        if self.sonido:
+        """Carga una canción o video según el tipo"""
+        # Detener audio previo
+        if hasattr(self, "sonido") and self.sonido:
             self.sonido.stop()
-        self.sonido = SoundLoader.load(cancion.archivo)
-        self.view.cancion_label.text = f"Reproduciendo: {cancion.titulo}"
+            self.sonido.unload()
+            self.sonido = None
 
-    def reproducir(self):
-        if self.sonido:
+        # Eliminar widgets previos
+        if hasattr(self.view, "audio_widget") and self.view.audio_widget:
+            self.view.remove_widget(self.view.audio_widget)
+            self.view.audio_widget = None
+        
+
+        # Guardar canción actual
+        self.cancion_actual = cancion
+
+        # Cargar según tipo
+        if cancion.tipo == "audio":
+            print(f"[INFO] Cargando audio: {cancion.archivo}")
+            self.sonido = SoundLoader.load(cancion.archivo)
+            if not self.sonido:
+                self.mostrar_popup("Error", f"No se pudo cargar el archivo de audio:\n{cancion.archivo}")
+                return
+            self.view.audio_widget = AudioPlayer(source=cancion.archivo)
+            self.view.add_widget(self.view.audio_widget)
+            self.view.cancion_label.text = f"🎵 Reproduciendo: {cancion.titulo}"
+
+        elif cancion.tipo == "video":
+            print(f"[INFO] Cargando video: {cancion.archivo}")
+            if not os.path.exists(cancion.archivo):
+                self.mostrar_popup("Error", f"No se encontró el archivo:\n{cancion.archivo}")
+                return
+            self.view.video_widget = VideoPlayer(cancion.archivo)
+            self.view.add_widget(self.view.video_widget)
+            self.view.cancion_label.text = f"🎬 Reproduciendo video: {cancion.titulo}"
+
+
+    def repro_play_pause(self, instance=None):
+        """Alterna entre play y pause, evitando errores si el archivo no se carga."""
+        cancion = self.lista.cancion_actual()
+        if not cancion:
+            self.mostrar_popup("Error", "No hay canción seleccionada.")
+            return
+
+        if not self.sonido:
+            print("[INFO] Cargando canción en reproducción...")
+            self.cargar_cancion(cancion)
+            if not self.sonido:
+                return  # Evitar crash si no se cargó
+            self.sonido.play()
+            return
+
+        # Si ya está cargado
+        if self.sonido.state == "play":
+            print("[DEBUG] Pausando reproducción")
+            self.sonido.stop()
+        else:
+            print("[DEBUG] Reanudando reproducción")
             self.sonido.play()
 
-    def repro_play_pause(self, instance):
-        if not self.sonido:
-            cancion = self.lista.cancion_actual()
-            if cancion:
-                self.cargar_cancion(cancion)
-                self.sonido.play()
-        else:
-            if self.sonido.state == 'play':
-                self.sonido.stop()
-            else:
-                self.sonido.play()
+    def repro_detener(self, instance=None):
+        if self.sonido:
+            self.sonido.stop()
+            print("[INFO] Reproducción detenida")
 
-    def repro_siguiente(self, instance):
+    def repro_siguiente(self, instance=None):
         siguiente = self.lista.siguiente_cancion()
         if siguiente:
             self.cargar_cancion(siguiente)
-            self.reproducir()
+            if self.sonido:
+                self.sonido.play()
+        else:
+            self.mostrar_popup("Fin de la lista", "No hay más canciones.")
 
-    def repro_anterior(self, instance):
+    def repro_anterior(self, instance=None):
         anterior = self.lista.anterior_cancion()
         if anterior:
             self.cargar_cancion(anterior)
-            self.reproducir()
+            if self.sonido:
+                self.sonido.play()
+        else:
+            self.mostrar_popup("Inicio de la lista", "No hay canciones anteriores.")
+
+    def repro_eliminar(self, instance=None):
+        cancion = self.lista.cancion_actual()
+        if not cancion:
+            self.mostrar_popup("Error", "No hay canción seleccionada.")
+            return
+
+        self.lista.eliminar(cancion)
+        self.mostrar_popup("Eliminado", f"'{cancion.titulo}' fue eliminada de la lista.")
+        self.view.actualizar_biblioteca()
+        self.sonido = None
+        self.view.cancion_label.text = "No hay canción seleccionada"
+
 
     def _procesar_descarga_exitosa(self, titulo, archivo):
         # Crear objeto Cancion
@@ -260,10 +321,13 @@ class MusicaController:
         
 
     def cargar_cancion(self, cancion):
-        if hasattr(self.view, "video_widget"):
+        if getattr(self.view, "video_widget", None):
             self.view.remove_widget(self.view.video_widget)
-        if hasattr(self.view, "audio_widget"):
+            self.view.video_widget = None
+        if getattr(self.view, "audio_widget", None):
             self.view.remove_widget(self.view.audio_widget)
+            self.view.audio_widget = None
+
 
         if cancion.tipo == "audio":
             self.view.audio_widget = AudioPlayer(cancion.archivo)
@@ -290,4 +354,29 @@ class MusicaController:
         )
         self.video_popup.open()
 
+    def eliminar_cancion_actual(self):
+        if not self.cancion_actual:
+            return
+        cancion = self.cancion_actual
+
+        # Detener sonido/video si está reproduciéndose
+        if self.sonido:
+            self.sonido.stop()
+            self.sonido.unload()
+            self.sonido = None
+
+        if cancion.tipo == "audio" and getattr(self.view, "audio_widget") and self.view.audio_widget:
+            self.view.remove_widget(self.view.audio_widget)
+            self.view.audio_widget = None
+        if cancion.tipo == "video" and getattr(self.view, "video_widget") and self.view.video_widget:
+            self.view.remove_widget(self.view.video_widget)
+            self.view.video_widget = None
+
+        # Quitar de la lista
+        self.lista.eliminar(cancion)  # suponiendo que tu ListaMusica tiene un método eliminar()
+        self.cancion_actual = None
+
+        # Actualizar interfaz
+        self.view.actualizar_biblioteca()
+        self.view.cancion_label.text = "No hay canción seleccionada"
 

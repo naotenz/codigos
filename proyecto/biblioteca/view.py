@@ -49,13 +49,16 @@ class CancionButton(ButtonBehavior, BoxLayout):
                 break
             nodo = nodo.siguiente
         self.controller.cargar_cancion(self.cancion)
-        self.controller.reproducir()
+        self.controller.repro_play_pause()
+
 
 
 class MusicaView(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.controller = None
+        self.audio_widget = None 
+        self.video_widget = None
         self.last_path = os.path.expanduser("~")
         self.orientation = "vertical"
         self.padding = 5
@@ -87,14 +90,19 @@ class MusicaView(BoxLayout):
         self.add_widget(self.cancion_label)
 
         # Controles
-        controls = BoxLayout(size_hint_y=None, height=50)
-        self.anterior_btn = Button(text="<< Anterior")
-        self.play_btn = Button(text="Play/Pause")
-        self.siguiente_btn = Button(text="Siguiente >>")
+        # Controles
+        controls = BoxLayout(size_hint_y=None, height=50, spacing=5)
+        self.anterior_btn = Button(text="⏮ Anterior")
+        self.play_btn = Button(text="▶️ / ⏸️")
+        self.siguiente_btn = Button(text="⏭ Siguiente")
+        self.eliminar_btn = Button(text="🗑 Eliminar")
+
         controls.add_widget(self.anterior_btn)
         controls.add_widget(self.play_btn)
         controls.add_widget(self.siguiente_btn)
+        controls.add_widget(self.eliminar_btn)
         self.add_widget(controls)
+
 
         # Barra de progreso reproducción
         self.progress = ProgressBar(max=100, value=0, size_hint_y=None, height=20)
@@ -120,12 +128,14 @@ class MusicaView(BoxLayout):
 
 
     # ----------------------------
-    def init_binds(self):
+    def init_binds(self):        
         self.agregar_btn.bind(on_press=self.controller.agregar_cancion_yt)
         self.play_btn.bind(on_press=self.controller.repro_play_pause)
         self.siguiente_btn.bind(on_press=self.controller.repro_siguiente)
         self.anterior_btn.bind(on_press=self.controller.repro_anterior)
+        self.eliminar_btn.bind(on_press=self.controller.repro_eliminar)
         self.cancel_btn.bind(on_press=self.controller.cancelar_descarga)
+
 
     def abrir_popup_arrastrar(self, instance):
         box = BoxLayout(orientation='vertical', padding=10, spacing=10)
