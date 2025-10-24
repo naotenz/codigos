@@ -22,8 +22,13 @@ from kivy.core.audio import SoundLoader
 from kivy.properties import NumericProperty
 from kivy.uix.videoplayer import VideoPlayer as KivyVideoPlayer
 from kivy.uix.boxlayout import BoxLayout
+<<<<<<< HEAD
 from kivy.core.window import Window
 from kivy.properties import NumericProperty, StringProperty
+=======
+
+from kivy.core.window import Window
+>>>>>>> 00e2c97 (cambios)
 
 class CancionButton(ButtonBehavior, BoxLayout):
     titulo = StringProperty()
@@ -49,16 +54,23 @@ class CancionButton(ButtonBehavior, BoxLayout):
                 break
             nodo = nodo.siguiente
         self.controller.cargar_cancion(self.cancion)
+<<<<<<< HEAD
         self.controller.repro_play_pause()
 
+=======
+        self.controller.reproducir()
+>>>>>>> 00e2c97 (cambios)
 
 
 class MusicaView(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.controller = None
+<<<<<<< HEAD
         self.audio_widget = None 
         self.video_widget = None
+=======
+>>>>>>> 00e2c97 (cambios)
         self.last_path = os.path.expanduser("~")
         self.orientation = "vertical"
         self.padding = 5
@@ -90,6 +102,7 @@ class MusicaView(BoxLayout):
         self.add_widget(self.cancion_label)
 
         # Controles
+<<<<<<< HEAD
         # Controles
         controls = BoxLayout(size_hint_y=None, height=50, spacing=5)
         self.anterior_btn = Button(text="⏮ Anterior")
@@ -104,6 +117,17 @@ class MusicaView(BoxLayout):
         self.add_widget(controls)
 
 
+=======
+        controls = BoxLayout(size_hint_y=None, height=50)
+        self.anterior_btn = Button(text="<< Anterior")
+        self.play_btn = Button(text="Play/Pause")
+        self.siguiente_btn = Button(text="Siguiente >>")
+        controls.add_widget(self.anterior_btn)
+        controls.add_widget(self.play_btn)
+        controls.add_widget(self.siguiente_btn)
+        self.add_widget(controls)
+
+>>>>>>> 00e2c97 (cambios)
         # Barra de progreso reproducción
         self.progress = ProgressBar(max=100, value=0, size_hint_y=None, height=20)
         self.add_widget(self.progress)
@@ -128,15 +152,24 @@ class MusicaView(BoxLayout):
 
 
     # ----------------------------
+<<<<<<< HEAD
     def init_binds(self):        
+=======
+    def init_binds(self):
+>>>>>>> 00e2c97 (cambios)
         self.agregar_btn.bind(on_press=self.controller.agregar_cancion_yt)
         self.play_btn.bind(on_press=self.controller.repro_play_pause)
         self.siguiente_btn.bind(on_press=self.controller.repro_siguiente)
         self.anterior_btn.bind(on_press=self.controller.repro_anterior)
+<<<<<<< HEAD
         self.eliminar_btn.bind(on_press=self.controller.repro_eliminar)
         self.cancel_btn.bind(on_press=self.controller.cancelar_descarga)
 
 
+=======
+        self.cancel_btn.bind(on_press=self.controller.cancelar_descarga)
+
+>>>>>>> 00e2c97 (cambios)
     def abrir_popup_arrastrar(self, instance):
         box = BoxLayout(orientation='vertical', padding=10, spacing=10)
         label = Label(
@@ -334,3 +367,38 @@ class VideoPlayer(BoxLayout):
         self.duration = self.video.duration
         self.state = self.video.state
 
+<<<<<<< HEAD
+=======
+
+
+
+class AudioPlayer(BoxLayout):
+    def __init__(self, source, **kwargs):
+        # Llama a super correctamente, pasando solo kwargs
+        super().__init__(**kwargs)
+        self.orientation = 'vertical'
+        self.size_hint = (1, None)
+        self.height = 150
+
+        # --- Audio ---
+        self.audio = SoundLoader.load(source)
+        if not self.audio:
+            print(f"No se pudo cargar el audio: {source}")
+
+        # --- Controles ---
+        controls = BoxLayout(size_hint_y=None, height=50)
+        self.btn_play = Button(text="▶️")
+        self.btn_play.bind(on_release=self.toggle_play)
+        controls.add_widget(self.btn_play)
+
+        self.add_widget(controls)
+
+    def toggle_play(self, instance=None):
+        if self.audio:
+            if self.audio.state == 'play':
+                self.audio.stop()
+                self.btn_play.text = "▶️"
+            else:
+                self.audio.play()
+                self.btn_play.text = "⏸️"
+>>>>>>> 00e2c97 (cambios)

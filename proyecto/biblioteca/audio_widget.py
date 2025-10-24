@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # audio_widget.py
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
@@ -101,3 +102,12 @@ class AudioPlayer(BoxLayout):
             self.position = self.sound.get_pos()
             self.progress.value = self.position / self.duration if self.duration else 0
             self.lbl_time.text = f"{int(self.position//60)}:{int(self.position%60):02} / {int(self.duration//60)}:{int(self.duration%60):02}"
+=======
+# archivo: audio_widget.py
+class AudioPlayer:
+    def __init__(self, ruta):
+        self.ruta = ruta
+
+    def play(self):
+        print(f"Reproduciendo {self.ruta}")
+>>>>>>> 00e2c97 (cambios)

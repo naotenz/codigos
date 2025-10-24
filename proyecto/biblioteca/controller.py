@@ -1,24 +1,39 @@
 import os
 import re
 import threading
+<<<<<<< HEAD
 import sys
+=======
+>>>>>>> 00e2c97 (cambios)
 from kivy.clock import Clock
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.core.audio import SoundLoader
+<<<<<<< HEAD
 
+=======
+>>>>>>> 00e2c97 (cambios)
 from model import Cancion, ListaMusica
 import yt_dlp
 from kivy.uix.video import Video
 from kivy.uix.slider import Slider
+<<<<<<< HEAD
 from view import MusicaView, VideoPlayer
+=======
+from view import VideoPlayer 
+from kivy.uix.videoplayer import VideoPlayer
+>>>>>>> 00e2c97 (cambios)
 from audio_widget import AudioPlayer
 
 
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 00e2c97 (cambios)
 # Logger personalizado
 class MyLogger:
     def debug(self, msg): pass
@@ -48,7 +63,11 @@ class MusicaController:
         box.add_widget(btn)
         popup = Popup(title=titulo, content=box, size_hint=(0.5, 0.3))
         btn.bind(on_press=popup.dismiss)
+<<<<<<< HEAD
         popup.open() 
+=======
+        popup.open()
+>>>>>>> 00e2c97 (cambios)
 
     # ----------------------------
     # Agregar canción desde YouTube
@@ -190,6 +209,7 @@ class MusicaController:
         self.view.actualizar_biblioteca()
 
     # ----------------------------
+<<<<<<< HEAD
         # ----------------------------
     # Reproducción segura de audio y video
     def cargar_cancion(self, cancion):
@@ -288,6 +308,42 @@ class MusicaController:
         self.sonido = None
         self.view.cancion_label.text = "No hay canción seleccionada"
 
+=======
+    # Reproducción
+    def cargar_cancion(self, cancion):
+        if self.sonido:
+            self.sonido.stop()
+        self.sonido = SoundLoader.load(cancion.archivo)
+        self.view.cancion_label.text = f"Reproduciendo: {cancion.titulo}"
+
+    def reproducir(self):
+        if self.sonido:
+            self.sonido.play()
+
+    def repro_play_pause(self, instance):
+        if not self.sonido:
+            cancion = self.lista.cancion_actual()
+            if cancion:
+                self.cargar_cancion(cancion)
+                self.sonido.play()
+        else:
+            if self.sonido.state == 'play':
+                self.sonido.stop()
+            else:
+                self.sonido.play()
+
+    def repro_siguiente(self, instance):
+        siguiente = self.lista.siguiente_cancion()
+        if siguiente:
+            self.cargar_cancion(siguiente)
+            self.reproducir()
+
+    def repro_anterior(self, instance):
+        anterior = self.lista.anterior_cancion()
+        if anterior:
+            self.cargar_cancion(anterior)
+            self.reproducir()
+>>>>>>> 00e2c97 (cambios)
 
     def _procesar_descarga_exitosa(self, titulo, archivo):
         # Crear objeto Cancion
@@ -321,6 +377,7 @@ class MusicaController:
         
 
     def cargar_cancion(self, cancion):
+<<<<<<< HEAD
         if getattr(self.view, "video_widget", None):
             self.view.remove_widget(self.view.video_widget)
             self.view.video_widget = None
@@ -328,6 +385,12 @@ class MusicaController:
             self.view.remove_widget(self.view.audio_widget)
             self.view.audio_widget = None
 
+=======
+        if hasattr(self.view, "video_widget"):
+            self.view.remove_widget(self.view.video_widget)
+        if hasattr(self.view, "audio_widget"):
+            self.view.remove_widget(self.view.audio_widget)
+>>>>>>> 00e2c97 (cambios)
 
         if cancion.tipo == "audio":
             self.view.audio_widget = AudioPlayer(cancion.archivo)
@@ -354,6 +417,7 @@ class MusicaController:
         )
         self.video_popup.open()
 
+<<<<<<< HEAD
     def eliminar_cancion_actual(self):
         if not self.cancion_actual:
             return
@@ -379,4 +443,6 @@ class MusicaController:
         # Actualizar interfaz
         self.view.actualizar_biblioteca()
         self.view.cancion_label.text = "No hay canción seleccionada"
+=======
+>>>>>>> 00e2c97 (cambios)
 
