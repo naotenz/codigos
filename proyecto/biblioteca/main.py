@@ -1,0 +1,21 @@
+import os
+# Forzar que Kivy use ffpyplayer como backend de video
+os.environ['KIVY_VIDEO'] = 'ffpyplayer'
+
+from kivy.app import App
+from view import MusicaView
+from controller import MusicaController
+
+
+class MusicaApp(App):
+    def build(self):
+        view = MusicaView()
+        controller = MusicaController(view)
+        view.controller = controller
+        view.init_binds()
+        return view
+
+
+if __name__ == "__main__":
+    MusicaApp().run()
+
