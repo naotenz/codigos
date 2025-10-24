@@ -14,7 +14,10 @@ from kivy.uix.slider import Slider
 from view import VideoPlayer 
 from kivy.uix.videoplayer import VideoPlayer
 from audio_widget import AudioPlayer
-
+from view import MusicaView, AudioPlayer, VideoPlayer
+from audio_widget import AudioPlayer
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 
 
@@ -48,7 +51,7 @@ class MusicaController:
         box.add_widget(btn)
         popup = Popup(title=titulo, content=box, size_hint=(0.5, 0.3))
         btn.bind(on_press=popup.dismiss)
-        popup.open()
+        popup.open() 
 
     # ----------------------------
     # Agregar canción desde YouTube

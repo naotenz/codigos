@@ -22,8 +22,8 @@ from kivy.core.audio import SoundLoader
 from kivy.properties import NumericProperty
 from kivy.uix.videoplayer import VideoPlayer as KivyVideoPlayer
 from kivy.uix.boxlayout import BoxLayout
-
 from kivy.core.window import Window
+from kivy.properties import NumericProperty, StringProperty
 
 class CancionButton(ButtonBehavior, BoxLayout):
     titulo = StringProperty()
@@ -324,35 +324,3 @@ class VideoPlayer(BoxLayout):
         self.duration = self.video.duration
         self.state = self.video.state
 
-
-
-
-class AudioPlayer(BoxLayout):
-    def __init__(self, source, **kwargs):
-        # Llama a super correctamente, pasando solo kwargs
-        super().__init__(**kwargs)
-        self.orientation = 'vertical'
-        self.size_hint = (1, None)
-        self.height = 150
-
-        # --- Audio ---
-        self.audio = SoundLoader.load(source)
-        if not self.audio:
-            print(f"No se pudo cargar el audio: {source}")
-
-        # --- Controles ---
-        controls = BoxLayout(size_hint_y=None, height=50)
-        self.btn_play = Button(text="▶️")
-        self.btn_play.bind(on_release=self.toggle_play)
-        controls.add_widget(self.btn_play)
-
-        self.add_widget(controls)
-
-    def toggle_play(self, instance=None):
-        if self.audio:
-            if self.audio.state == 'play':
-                self.audio.stop()
-                self.btn_play.text = "▶️"
-            else:
-                self.audio.play()
-                self.btn_play.text = "⏸️"
