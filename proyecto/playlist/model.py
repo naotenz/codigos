@@ -1,5 +1,3 @@
-# model.py
-
 class Estudiante:
     def __init__(self, id, nombre, apellido, calificaciones=None):
         self.id = id
@@ -14,7 +12,6 @@ class Estudiante:
 
     def __str__(self):
         notas = ', '.join(map(str, self.calificaciones))
-        # sin promedio aquí
         return f"ID: {self.id}, Nombre: {self.nombre} {self.apellido}, Calificaciones: [{notas}]"
 
 
@@ -22,3 +19,4 @@ class Nodo:
     def __init__(self, estudiante):
         self.estudiante = estudiante
         self.siguiente = None
+

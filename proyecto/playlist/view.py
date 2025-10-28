@@ -4,22 +4,23 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
-from lista_estudiantes import ListaEstudiantes
 from kivy.uix.popup import Popup
+from controller import EstudianteController
 from model import Estudiante
+
 
 class GestionEstudiantesView(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.orientation = 'vertical'
-        self.lista = ListaEstudiantes()
-        self.siguiente_id = 1  # ID automático
+        self.controller = EstudianteController()
+        self.siguiente_id = 1
 
         # Label de estado
         self.estado_label = Label(text='Sistema de Gestión de Estudiantes', size_hint_y=None, height=30)
         self.add_widget(self.estado_label)
 
-        # Formulario para inscribir / actualizar calificaciones
+        # Formulario
         form = BoxLayout(size_hint_y=None, height=30)
         self.nombre_input = TextInput(hint_text='Nombre', multiline=False)
         self.apellido_input = TextInput(hint_text='Apellido', multiline=False)
@@ -45,145 +46,116 @@ class GestionEstudiantesView(BoxLayout):
         botones.add_widget(btn_promedio)
         self.add_widget(botones)
 
-        # Caja para buscar estudiante por ID
+        # Buscar estudiante
+        buscar_box = BoxLayout(size_hint_y=None, height=30)
         self.buscar_input = TextInput(hint_text='ID a buscar', size_hint_x=0.3, multiline=False)
         self.buscar_btn = Button(text='Buscar Estudiante', size_hint_x=0.7)
         self.buscar_btn.bind(on_press=self.buscar_estudiante)
-        buscar_box = BoxLayout(size_hint_y=None, height=30)
         buscar_box.add_widget(self.buscar_input)
         buscar_box.add_widget(self.buscar_btn)
         self.add_widget(buscar_box)
 
-        # ScrollView para reporte
+        # Reporte (scroll)
         self.scroll = ScrollView()
         self.grid = GridLayout(cols=1, size_hint_y=None)
         self.grid.bind(minimum_height=self.grid.setter('height'))
         self.scroll.add_widget(self.grid)
         self.add_widget(self.scroll)
 
-    # Actualizar estado
+    # --- Métodos auxiliares ---
     def actualizar_estado(self, texto):
         self.estado_label.text = texto
 
-    # Actualizar reporte en ScrollView
-    def actualizar_lista(self, reporte_texto):
+    def actualizar_lista(self, texto):
         self.grid.clear_widgets()
-        for line in reporte_texto.split('\n'):
-            lbl = Label(text=line, size_hint_y=None, height=30)
+        for linea in texto.split('\n'):
+            lbl = Label(text=linea, size_hint_y=None, height=30)
             self.grid.add_widget(lbl)
 
-    # Funciones de botones
+    # --- Funciones principales ---
     def inscribir(self, instance):
         try:
-            nombre = self.nombre_input.text
-            apellido = self.apellido_input.text
+            nombre = self.nombre_input.text.strip()
+            apellido = self.apellido_input.text.strip()
             calificaciones = list(map(int, self.calif_input.text.split()))
 
+            if not nombre or not apellido:
+                self.actualizar_estado("Error: Nombre y apellido son obligatorios")
+                return
             if len(calificaciones) != 3:
-                self.actualizar_estado("Error: Debes ingresar exactamente 3 calificaciones")
+                self.actualizar_estado("Error: Ingresa exactamente 3 calificaciones")
                 return
             if any(c < 0 or c > 100 for c in calificaciones):
-                self.actualizar_estado("Error: Las calificaciones deben estar entre 0 y 100")
+                self.actualizar_estado("Error: Calificaciones entre 0 y 100")
                 return
 
-            id = self.siguiente_id
+            estudiante = Estudiante(self.siguiente_id, nombre, apellido, calificaciones)
+            self.controller.inscribir_estudiante(estudiante)
+            self.actualizar_estado(f"Estudiante {nombre} inscrito con ID {self.siguiente_id}")
             self.siguiente_id += 1
-
-            estudiante = Estudiante(id, nombre, apellido, calificaciones)
-            self.lista.inscribir(estudiante)
-            self.actualizar_estado(f'Estudiante {nombre} inscrito con ID {id}')
-            self.generar_reporte(None)
+            self.actualizar_lista(self.controller.generar_reporte())
         except Exception as e:
-            self.actualizar_estado(f'Error: {e}')
+            self.actualizar_estado(f"Error: {e}")
 
     def dar_de_baja(self, instance):
         try:
-            id = int(self.buscar_input.text)  # Usar el ID del TextInput
-            if self.lista.dar_de_baja(id):
-                self.actualizar_estado(f'Estudiante con ID {id} eliminado')
-                self.calif_input.text = ''
-                self.generar_reporte(None)
+            id = int(self.buscar_input.text)
+            if self.controller.dar_de_baja(id):
+                self.actualizar_estado(f"Estudiante con ID {id} eliminado")
             else:
-                self.actualizar_estado(f'Estudiante con ID {id} no encontrado')
+                self.actualizar_estado(f"Estudiante con ID {id} no encontrado")
+            self.actualizar_lista(self.controller.generar_reporte())
         except ValueError:
-            self.actualizar_estado("ID inválido")
+            self.actualizar_estado("Error: ID inválido")
 
     def actualizar_calificaciones(self, instance):
         try:
-            id = int(self.buscar_input.text)  # Usar ID del TextInput
+            id = int(self.buscar_input.text)
             calificaciones = list(map(int, self.calif_input.text.split()))
             if len(calificaciones) != 3:
-                self.actualizar_estado("Error: Debes ingresar exactamente 3 calificaciones")
+                self.actualizar_estado("Error: Ingresa exactamente 3 calificaciones")
                 return
             if any(c < 0 or c > 100 for c in calificaciones):
-                self.actualizar_estado("Error: Las calificaciones deben estar entre 0 y 100")
+                self.actualizar_estado("Error: Calificaciones entre 0 y 100")
                 return
-            if self.lista.actualizar_calificaciones(id, calificaciones):
-                self.actualizar_estado(f'Calificaciones del estudiante con ID {id} actualizadas')
-                self.generar_reporte(None)
+            if self.controller.actualizar_calificaciones(id, calificaciones):
+                self.actualizar_estado(f"Calificaciones del estudiante con ID {id} actualizadas")
             else:
-                self.actualizar_estado(f'Estudiante con ID {id} no encontrado')
+                self.actualizar_estado(f"Estudiante con ID {id} no encontrado")
+            self.actualizar_lista(self.controller.generar_reporte())
         except ValueError:
-            self.actualizar_estado("ID inválido o calificaciones incorrectas")
-
-
+            self.actualizar_estado("Error: ID o calificaciones inválidas")
 
     def calcular_promedio(self, instance):
-        id_texto = self.buscar_input.text.strip()
-
-        # ❌ Campo vacío o no numérico
-        if not id_texto.isdigit():
-            popup = Popup(title="Error",
-                      content=Label(text="Por favor ingresa un ID válido", halign="center"),
-                      size_hint=(0.6, 0.4))
-            popup.open()
+        id_txt = self.buscar_input.text.strip()
+        if not id_txt.isdigit():
+            Popup(title="Error",
+                  content=Label(text="Por favor ingresa un ID válido"),
+                  size_hint=(0.6, 0.4)).open()
             return
-
-        id_num = int(id_texto)
-        estudiante = self.lista.buscar(id_num)
-
-        # ❌ ID no encontrado
+        id_num = int(id_txt)
+        estudiante = self.controller.buscar_estudiante(id_num)
         if not estudiante:
-            popup = Popup(title="Error",
-                      content=Label(text=f"Estudiante con ID {id_num} no encontrado", halign="center"),
-                      size_hint=(0.6, 0.4))
-            popup.open()
+            Popup(title="Error",
+                  content=Label(text=f"Estudiante con ID {id_num} no encontrado"),
+                  size_hint=(0.6, 0.4)).open()
             return
-
-        # ✅ ID válido, mostrar promedio
         promedio = estudiante.promedio()
-        popup = Popup(title="📘 Promedio del estudiante",
-                  content=Label(text=f"El promedio de {estudiante.nombre} {estudiante.apellido} (ID {id_num}) es: {promedio:.2f}",
-                                halign="center"),
-                  size_hint=(0.7, 0.4))
-        popup.open()
-
-
-
-
-
-    def generar_reporte(self, instance):
-        texto = ""
-        actual = self.lista.cabeza
-        while actual:
-            texto += str(actual.estudiante) + "\n"
-            actual = actual.siguiente
-        self.actualizar_lista(texto)
-
+        Popup(title="📘 Promedio del estudiante",
+              content=Label(text=f"El promedio de {estudiante.nombre} {estudiante.apellido} (ID {id_num}) es: {promedio:.2f}"),
+              size_hint=(0.7, 0.4)).open()
 
     def buscar_estudiante(self, instance):
         try:
             id = int(self.buscar_input.text)
-            estudiante = self.lista.buscar(id)
+            estudiante = self.controller.buscar_estudiante(id)
             if estudiante:
-                # Mostrar info en estado_label
                 self.actualizar_estado(str(estudiante))
-                # Llenar calif_input con sus calificaciones actuales para poder modificarlas
                 self.calif_input.text = ' '.join(map(str, estudiante.calificaciones))
             else:
-                self.actualizar_estado(f'Estudiante con ID {id} no encontrado')
+                self.actualizar_estado(f"Estudiante con ID {id} no encontrado")
                 self.calif_input.text = ''
         except ValueError:
-            self.actualizar_estado("ID inválido")
+            self.actualizar_estado("Error: ID inválido")
 
 
